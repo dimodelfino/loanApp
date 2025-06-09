@@ -4,19 +4,162 @@
         <description>This step retrieves an offer from the offer service</description>
         <name>Get_Offer_From_Offer_Service</name>
         <label>Get Offer From Offer Service</label>
-        <locationX>176</locationX>
+        <locationX>182</locationX>
         <locationY>242</locationY>
-        <actionName>getLoanOffer</actionName>
+        <actionName>GetLoanOffer</actionName>
         <actionType>apex</actionType>
         <connector>
-            <targetReference>Show_Offer</targetReference>
+            <targetReference>Check_Offer_Status</targetReference>
         </connector>
         <flowTransactionModel>Automatic</flowTransactionModel>
-        <nameSegment>getLoanOffer</nameSegment>
-        <storeOutputAutomatically>true</storeOutputAutomatically>
-        <versionSegment>1</versionSegment>
+        <inputParameters>
+            <name>BorrowerSSN</name>
+            <value>
+                <elementReference>BorrowerSSN</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>city</name>
+            <value>
+                <elementReference>BorrowerAddress.city</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>email</name>
+            <value>
+                <elementReference>email.value</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>firstName</name>
+            <value>
+                <elementReference>BorrowerName.firstName</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>lastName</name>
+            <value>
+                <elementReference>BorrowerName.lastName</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>numberOfActiveCreditCards</name>
+            <value>
+                <elementReference>numberOfActiveCreditCards</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>phone</name>
+            <value>
+                <elementReference>phone.value</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>postalCode</name>
+            <value>
+                <elementReference>BorrowerAddress.postalCode</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>state</name>
+            <value>
+                <elementReference>BorrowerAddress.province</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>street</name>
+            <value>
+                <elementReference>BorrowerAddress.street</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>totalLoanAmountRequested</name>
+            <value>
+                <elementReference>totalLoanAmountRequested</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>GetLoanOffer</nameSegment>
+        <offset>0</offset>
+        <outputParameters>
+            <assignToReference>varAccountId</assignToReference>
+            <name>accountId</name>
+        </outputParameters>
+        <outputParameters>
+            <assignToReference>varApplicationId</assignToReference>
+            <name>applicationId</name>
+        </outputParameters>
+        <outputParameters>
+            <assignToReference>errorMessageDisplay</assignToReference>
+            <name>errorMessage</name>
+        </outputParameters>
+        <outputParameters>
+            <assignToReference>varInterestRate</assignToReference>
+            <name>interestRate</name>
+        </outputParameters>
+        <outputParameters>
+            <assignToReference>varIsSuccess</assignToReference>
+            <name>isSuccess</name>
+        </outputParameters>
+        <outputParameters>
+            <assignToReference>varMonthlyPayment</assignToReference>
+            <name>monthlyPayment</name>
+        </outputParameters>
+        <outputParameters>
+            <assignToReference>varNumberOfActiveCreditCards</assignToReference>
+            <name>numberOfActiveCreditCards</name>
+        </outputParameters>
+        <outputParameters>
+            <assignToReference>varTermMonths</assignToReference>
+            <name>termMonths</name>
+        </outputParameters>
+        <outputParameters>
+            <assignToReference>varTotalLoanAmountRequested</assignToReference>
+            <name>totalLoanAmountRequested</name>
+        </outputParameters>
     </actionCalls>
     <apiVersion>61.0</apiVersion>
+    <assignments>
+        <name>Assign_Error_Message</name>
+        <label>Assign Error Message</label>
+        <locationX>314</locationX>
+        <locationY>458</locationY>
+        <assignmentItems>
+            <assignToReference>errorMessageDisplay</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>errorMessageDisplay</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <isGoTo>true</isGoTo>
+            <targetReference>Get_Prospect_Input</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <name>Check_Offer_Status</name>
+        <label>Check Offer Status</label>
+        <locationX>182</locationX>
+        <locationY>350</locationY>
+        <defaultConnector>
+            <targetReference>Assign_Error_Message</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Offer Invalid</defaultConnectorLabel>
+        <rules>
+            <name>Offer_Valid</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>varIsSuccess</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Show_Offer</targetReference>
+            </connector>
+            <label>Offer Valid</label>
+        </rules>
+    </decisions>
     <description>A flow to walk a prospect through our workflow</description>
     <environments>Default</environments>
     <interviewLabel>Reach Application Process {!$Flow.CurrentDateTime}</interviewLabel>
@@ -44,7 +187,7 @@
         <description>This step collects data from the borrower</description>
         <name>Get_Prospect_Input</name>
         <label>Get Prospect Input</label>
-        <locationX>176</locationX>
+        <locationX>182</locationX>
         <locationY>134</locationY>
         <allowBack>true</allowBack>
         <allowFinish>true</allowFinish>
@@ -58,6 +201,21 @@
             <fieldType>DisplayText</fieldType>
         </fields>
         <fields>
+            <name>Display_Error_Message</name>
+            <fieldText>&lt;p&gt;&lt;strong style=&quot;color: rgb(255, 0, 0);&quot;&gt;&lt;em&gt;{!errorMessageDisplay}&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <visibilityRule>
+                <conditionLogic>and</conditionLogic>
+                <conditions>
+                    <leftValueReference>errorMessageDisplay</leftValueReference>
+                    <operator>IsNull</operator>
+                    <rightValue>
+                        <booleanValue>false</booleanValue>
+                    </rightValue>
+                </conditions>
+            </visibilityRule>
+        </fields>
+        <fields>
             <name>BorrowerName</name>
             <extensionName>flowruntime:name</extensionName>
             <fieldType>ComponentInstance</fieldType>
@@ -67,6 +225,51 @@
                     <booleanValue>false</booleanValue>
                 </value>
             </inputParameters>
+            <inputParameters>
+                <name>firstName</name>
+                <value>
+                    <elementReference>BorrowerName.firstName</elementReference>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>label</name>
+                <value>
+                    <stringValue>Name</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>lastName</name>
+                <value>
+                    <elementReference>BorrowerName.lastName</elementReference>
+                </value>
+            </inputParameters>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <storeOutputAutomatically>true</storeOutputAutomatically>
+            <validationRule>
+                <errorMessage>&lt;p&gt;&lt;span style=&quot;color: rgb(255, 0, 0);&quot;&gt;Please complete both first and last name fields.&lt;/span&gt;&lt;/p&gt;</errorMessage>
+                <formulaExpression>!ISBLANK({!BorrowerName.firstName}) || 
+!ISBLANK({!BorrowerName.lastName})</formulaExpression>
+            </validationRule>
+        </fields>
+        <fields>
+            <name>email</name>
+            <extensionName>flowruntime:email</extensionName>
+            <fieldType>ComponentInstance</fieldType>
+            <inputParameters>
+                <name>required</name>
+                <value>
+                    <booleanValue>true</booleanValue>
+                </value>
+            </inputParameters>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <storeOutputAutomatically>true</storeOutputAutomatically>
+        </fields>
+        <fields>
+            <name>phone</name>
+            <extensionName>flowruntime:phone</extensionName>
+            <fieldType>ComponentInstance</fieldType>
             <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
             <isRequired>true</isRequired>
             <storeOutputAutomatically>true</storeOutputAutomatically>
@@ -86,12 +289,21 @@
             <storeOutputAutomatically>true</storeOutputAutomatically>
         </fields>
         <fields>
-            <name>Requested_Loan_Amount</name>
+            <name>totalLoanAmountRequested</name>
             <dataType>Number</dataType>
             <fieldText>Requested Loan Amount</fieldText>
             <fieldType>InputField</fieldType>
             <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
-            <isRequired>false</isRequired>
+            <isRequired>true</isRequired>
+            <scale>0</scale>
+        </fields>
+        <fields>
+            <name>numberOfActiveCreditCards</name>
+            <dataType>Number</dataType>
+            <fieldText>Number of Active Credit Cards or Lines of Credit</fieldText>
+            <fieldType>InputField</fieldType>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
             <scale>0</scale>
         </fields>
         <fields>
@@ -100,7 +312,11 @@
             <fieldText>SSN</fieldText>
             <fieldType>InputField</fieldType>
             <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
-            <isRequired>false</isRequired>
+            <isRequired>true</isRequired>
+            <validationRule>
+                <errorMessage>&lt;p&gt;Please enter a valid SSN.&lt;/p&gt;</errorMessage>
+                <formulaExpression>REGEX({!BorrowerSSN}, &apos;^\\d{9}$&apos;)</formulaExpression>
+            </validationRule>
         </fields>
         <showFooter>true</showFooter>
         <showHeader>true</showHeader>
@@ -109,20 +325,151 @@
         <description>This step shows the offer to the prospect</description>
         <name>Show_Offer</name>
         <label>Show Offer</label>
-        <locationX>176</locationX>
-        <locationY>350</locationY>
+        <locationX>50</locationX>
+        <locationY>458</locationY>
         <allowBack>true</allowBack>
         <allowFinish>true</allowFinish>
         <allowPause>true</allowPause>
+        <fields>
+            <name>OfferDetailsText</name>
+            <fieldText>&lt;p&gt;&lt;strong style=&quot;font-size: 22px;&quot;&gt;Congratulations! Based on your information, here&apos;s the loan offer you qualify for:&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;strong&gt;Loan Amount Requested&lt;/strong&gt;:{!varTotalLoanAmountRequested}&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Interest Rate&lt;/strong&gt; (Annual): {!varInterestRate}&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Term (Months):&lt;/strong&gt; {!varTermMonths}&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Estimated Monthly Payment: &lt;/strong&gt;{!varMonthlyPayment}&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;em&gt;If these terms look good, please  upload your identity document and &lt;/em&gt;&lt;em style=&quot;background-color: rgb(255, 255, 255); color: rgb(68, 68, 68);&quot;&gt;click Finish to submit your application.&lt;/em&gt;&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <fields>
+            <name>IdentityDocumentUpload</name>
+            <extensionName>forceContent:fileUpload</extensionName>
+            <fieldType>ComponentInstance</fieldType>
+            <inputParameters>
+                <name>label</name>
+                <value>
+                    <stringValue>Upload Identity Document</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>recordId</name>
+                <value>
+                    <elementReference>varApplicationId</elementReference>
+                </value>
+            </inputParameters>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <storeOutputAutomatically>true</storeOutputAutomatically>
+        </fields>
+        <fields>
+            <name>ApplicationProcessOfferPresentation</name>
+            <extensionName>c:applicationProcessOfferPresentation</extensionName>
+            <fieldType>ComponentInstance</fieldType>
+            <inputParameters>
+                <name>applicationId</name>
+                <value>
+                    <elementReference>varApplicationId</elementReference>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>interestRate</name>
+                <value>
+                    <elementReference>varInterestRate</elementReference>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>monthlyPayment</name>
+                <value>
+                    <elementReference>varMonthlyPayment</elementReference>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>termMonths</name>
+                <value>
+                    <elementReference>varTermMonths</elementReference>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>totalLoanAmountRequested</name>
+                <value>
+                    <elementReference>varTotalLoanAmountRequested</elementReference>
+                </value>
+            </inputParameters>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <storeOutputAutomatically>true</storeOutputAutomatically>
+        </fields>
         <showFooter>true</showFooter>
         <showHeader>true</showHeader>
     </screens>
     <start>
-        <locationX>50</locationX>
+        <locationX>56</locationX>
         <locationY>0</locationY>
         <connector>
             <targetReference>Get_Prospect_Input</targetReference>
         </connector>
     </start>
     <status>Draft</status>
+    <variables>
+        <name>errorMessageDisplay</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>varAccountId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>varApplicationId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>varInterestRate</name>
+        <dataType>Number</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <scale>2</scale>
+    </variables>
+    <variables>
+        <name>varIsSuccess</name>
+        <dataType>Boolean</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>varMonthlyPayment</name>
+        <dataType>Currency</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <scale>2</scale>
+    </variables>
+    <variables>
+        <name>varNumberOfActiveCreditCards</name>
+        <dataType>Number</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <scale>0</scale>
+    </variables>
+    <variables>
+        <name>varTermMonths</name>
+        <dataType>Number</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <scale>0</scale>
+    </variables>
+    <variables>
+        <name>varTotalLoanAmountRequested</name>
+        <dataType>Currency</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <scale>2</scale>
+    </variables>
 </Flow>

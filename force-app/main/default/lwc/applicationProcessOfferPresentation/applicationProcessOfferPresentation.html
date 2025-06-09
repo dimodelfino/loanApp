@@ -1,3 +1,32 @@
 <template>
-    
+    <lightning-card title="" class="slds-card_boundary">
+        <div class="slds-p-around_medium">
+            <div class="slds-var-m-bottom_medium">
+                <h1 class="slds-var-m-bottom_medium"><b>Congratulations! Based on your information, here's the loan offer you qualify for:</b></h1>
+                <lightning-layout vertical-align="start" multiple-rows>
+                    <lightning-layout-item size="12">
+                        <ul>
+                            <li><p><strong>Loan Amount: </strong> ${totalLoanAmountRequested}</p></li>
+                            <li><p><strong>Interest Rate  (Annual): </strong> {interestRate}%</p></li>
+                            <li><p><strong>Monthly Payment:</strong> ${monthlyPayment}</p></li>
+                            <li><p><strong>Term:</strong> {termMonths} months</p></li>
+                        </ul>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </div>
+            <br>
+            <br>
+            <p><i>If these terms look good, please upload your identity document and click Finish to submit your application.</i></p>
+            <br>
+            <div class="slds-var-m-bottom_medium">
+                <lightning-file-upload
+                    label="Upload Identity Document"
+                    name="identityUpload"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    record-id={applicationId}
+                    onuploadfinished={handleUploadFinished}>
+                </lightning-file-upload>
+            </div>
+        </div>
+    </lightning-card>
 </template>

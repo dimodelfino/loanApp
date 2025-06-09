@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>61.0</apiVersion>
-    <isExposed>false</isExposed>
+    <isExposed>true</isExposed>
+    <targets>
+      <target>lightning__FlowScreen</target>
+    </targets>
+    <targetConfigs>
+      <targetConfig targets="lightning__FlowScreen">
+          <property name="totalLoanAmountRequested" type="Integer" label="Total Loan Amount" />
+          <property name="interestRate" type="Integer" label="Interest Rate" />
+          <property name="monthlyPayment" type="Integer" label="Monthly Payment" />
+          <property name="termMonths" type="Integer" label="Term (Months)" />
+          <property name="applicationId" type="String" label="ApplicationId" />
+      </targetConfig>
+    </targetConfigs>
 </LightningComponentBundle>
